@@ -1,0 +1,66 @@
+body {
+    background-color: snow;
+}
+
+.header {
+    text-align: center;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    color: orangered;
+    background-color: snow;
+    font-weight: bold;
+    border-left: 2px solid black;
+    border-right: 2px solid black;
+    width: 30%;
+    display: block;
+    margin: auto;
+}
+
+hr {
+    border: 1px solid black;
+}
+
+.info {
+    display: block;
+    margin: auto;
+    text-align: center;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    width: 30%;
+}
+
+.quizBlock {
+    border: 2px solid orangered;
+    text-align: center;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    width: 50%;
+    margin: auto;
+}
+
+.question {
+    border-bottom: 1px solid black;
+    padding-bottom: 1em;
+}
+
+.question label {
+}
+
+.endBlock {
+    display: block;
+    margin: auto;
+    text-align: center;
+    margin-top: 2em;
+    width: 50%;
+    height: 50%;
+    box-sizing: border-box;
+    margin-bottom: 2em;
+}
+
+.endBlock button {
+    scale: 200%;
+}
+
+.endBlock label {
+    display: block;
+    margin: 1em;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-size: xx-large;
+}
