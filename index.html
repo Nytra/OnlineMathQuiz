@@ -3,207 +3,7 @@
     <head>
         <title>Sam's Math Quiz</title>
         <link rel="stylesheet" href="style.css">
-        <script type="text/javascript">
-
-            function submit() {
-
-                // why is this function so big?
-                // because it is designed to be as scalable as possible
-                // it could handle infinite randomly generated math questions
-                // provided that the questions are either basic arithmetic with only one operator
-                // or trigonometry questions (sin, cos, tan) with a number in the brackets
-
-                let questions = document.getElementsByClassName("question")
-                let reArith = /\d*[+-/*x]\d*/; // for detecting standard arithmetic questions
-                let reTrig = /^\b(sin|cos|tan)\b/; // for detecting trigonometry questions
-
-                let operators = ['+', '-', '/', 'x']; // we will always display 'x' instead of '*'
-                let TO_RAD = 3.14 / 180;
-
-                // number of questions the user got right
-                let numCorrect = 0;
-
-                let notAllQuestionsAnswered = false;
-
-                for (let i = 0; i < questions.length; i++) {
-                    let questionId = questions[i].getAttribute("name");
-                    let children = questions[i].childNodes;
-                    
-                    // stores the processed contents of the <h2> tag
-                    let mathProblem = "";
-
-                    let isTrig = false;
-                    let isArith = false;
-
-                    // we will evaluate this later
-                    let correctAnswer = null;
-
-                    let userAnswer = null;
-
-                    for (let j = 0; j < children.length; j++) {
-                        
-                        // check for h2 tag, only if we have not already obtained the math problem
-                        if (children[j].tagName == "H2" && mathProblem == "") {
-                            let innerHTML = children[j].innerHTML;
-
-                            // iterate through math problem string
-                            for (let k = 0; k < innerHTML.length; k++) {
-                                
-                                // remove spaces from math problem
-                                if (innerHTML[k] != ' ') {
-                                    mathProblem += innerHTML[k];
-                                }
-                            }                                    
-                            
-                            // check arithmetic match
-                            if (reArith.test(mathProblem)) {
-                                isArith = true;
-                            }
-
-                            // check trig match
-                            if (reTrig.test(mathProblem)) {
-                                isTrig = true;
-                            }
-
-                        }
-
-                        // if we have not yet obtained the user selected answer
-                        else if (children[j].tagName == "INPUT" && children[j].checked && userAnswer == null) {
-                            selectedId = children[j].id;
-
-                            // find the label with 'for' attribute as '#id'
-                            for (let k = 0; k < children.length; k++) {
-                                if (children[k].tagName == "LABEL" && children[k].getAttribute("for") == '#' + selectedId) {
-                                    // we have the user answer
-                                    userAnswer = children[k].innerHTML; 
-                                }
-                            }
-                        }
-                        
-                    }
-
-                    if (userAnswer == null) {
-                        notAllQuestionsAnswered = true;
-                        document.getElementById("resultLabel").innerHTML = "Please answer all questions.";
-                        return;
-                    }
-
-                    // now evaluate what the correct answer to the math problem is
-                    if (isTrig == true && correctAnswer == null) {
-
-                            // sin(90) - we want the name of function 'sin' and the number '90'
-
-                            // split based on open bracket will look like ['sin', '90)']
-                            let parts = mathProblem.split("("); 
-                            // so remove the bracket from '90)'
-                            let value = Number(parts[1].substring(0, parts[1].length - 1)); 
-                            // take the name of function
-                            let func = parts[0];                                                    
-
-                            // evaluate correct answer to 1 decimal place
-                            switch(func) {
-                                case "sin":
-                                    correctAnswer = Math.sin(value * TO_RAD).toFixed(1);
-                                    break;
-                                case "cos":                                
-                                    correctAnswer = Math.cos(value * TO_RAD).toFixed(1);
-                                    break;
-                                case "tan":                                    
-                                    correctAnswer = Math.tan(value * TO_RAD).toFixed(1);
-                                    break;
-                                default:
-                                    // this should never execute because of the regular expression check
-                                    console.log("error: unknown trig function");
-                            }
-
-                            // we have the result of the trig function
-                            if (correctAnswer != null) {
-                                //console.log("result: " + correctAnswer);
-                            }
-                    }
-                    else if (isArith == true && correctAnswer == null) {
-                        
-                        // first extract the operator +-x/
-                        let operator = null;
-                        for (let k = 0; k < operators.length; k++) {
-                            if (mathProblem.includes(operators[k])) {
-                                operator = operators[k];
-                                break;
-                            }
-                        }
-                        if (operator != null) {
-                            // split based on the operator to get the operands
-                            let num1 = mathProblem.split(operator)[0];
-                            let num2 = mathProblem.split(operator)[1];
-                            
-                            // evaluate correct answer
-                            switch(operator) {
-                                case "+":
-                                    correctAnswer = Number(num1) + Number(num2);
-                                    break;
-                                case "-":
-                                    correctAnswer = Number(num1) - Number(num2);
-                                    break;
-                                case "x":
-                                    correctAnswer = Number(num1) * Number(num2);
-                                    break;
-                                case "/":
-                                    correctAnswer = Number(num1) / Number(num2);
-                                    break;
-                            }
-
-                            if (correctAnswer != null) {
-                                //console.log("result: " + correctAnswer);
-                            }
-                        }
-                    }
-
-                    // clean user answer if it contains fancy squareroot html or forward-slash
-                    //console.log(userAnswer);
-                    if (userAnswer.includes("/") && !(userAnswer.includes("<") || userAnswer.includes(">"))) {
-                        let num1 = userAnswer.split("/")[0];
-                        let num2 = userAnswer.split("/")[1];
-                        userAnswer = num1 / num2;
-                    }
-                    else if (userAnswer.includes("<msqrt>")) {
-                        // we use fancy html to display sqrt symbol
-                        // <math><msqrt><mi>3</mi></msqrt></math>
-                        // get the values from that html
-
-                        // first get the value between the <mi> and </mi> tags
-                        let sqrtNum = userAnswer.split("<mi>")[1].split("</mi>")[0];
-
-                        // sometimes there will be another value at the end
-                        // <math><msqrt><mi>3</mi></msqrt></math>/2
-                        // the above means sqrt(3) divided by 2
-                        let otherNum = userAnswer.split("</math>/")[1];
-                        
-                        // this otherNum won't always be there
-                        if (otherNum != undefined) {
-                            userAnswer = Math.sqrt(sqrtNum) / otherNum; 
-                        }
-                        else {
-                            userAnswer = Math.sqrt(sqrtNum);
-                        }
-                    }
-
-                    // check if userAnswer matches correctAnswer
-                    if (userAnswer == Number(correctAnswer)) {
-                        console.log("correct: " + userAnswer + "=" + correctAnswer);
-                        numCorrect += 1;
-                    }
-                    else {
-                        console.log("incorrect: " + userAnswer + "!=" + correctAnswer);
-                    }
-
-                    // display results
-                    document.getElementById("resultLabel").innerHTML = "Result: " + numCorrect + '/' + questions.length;
-
-                }
-
-                //return;
-            }
-        </script>
+        <script src="script.js"></script>
     </head>
 
     <body>
@@ -214,6 +14,7 @@
         <div class="info">
             <h2>Try to answer these questions correctly!</h2>
         </div>
+        <button onclick="randomizeQuestions();" id="randomizeButton">Get new questions</button>
         <div class="quizBlock">
             <div class="question" name="q1">
                 <h2>2 + 2</h2>
@@ -262,12 +63,32 @@
             </div>
             <div class="question", name="q6">
                 <h2>tan(45)</h2>
-                <label for="#q6-1">-1</label>
-                <input type="radio" name="q6" id="q6-1"> <br/>
-                <label for="#q6-2">1</label>
-                <input type="radio" name="q6" id="q6-2"> <br/>
-                <label for="#q6-3">inf</label>
-                <input type="radio" name="q6" id="q6-3"> <br/>
+                <table>
+                    <tr>
+                        <td>
+                            <label for="#q6-1">-1</label>
+                        </td>
+                        <td>
+                            <input type="radio" name="q6" id="q6-1"> 
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label for="#q6-2">1</label>
+                        </td>
+                        <td>
+                            <input type="radio" name="q6" id="q6-2"> 
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label for="#q6-3">inf</label>
+                        </td>
+                        <td>
+                            <input type="radio" name="q6" id="q6-3"> 
+                        </td>
+                    </tr>
+                </table>
             </div>
         </div>
 
