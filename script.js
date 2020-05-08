@@ -74,6 +74,7 @@ function submit() {
                     selectedId = inputElement.id;
                     if (labelsAndInputs[idx][0].tagName == "LABEL" && labelsAndInputs[idx][0].getAttribute("for") == "#" + selectedId) {
                         userAnswer = labelsAndInputs[idx][0].innerHTML;
+                        //console.log(userAnswer);
                     }
                 }
             }
@@ -127,6 +128,10 @@ function submit() {
                         console.log("error: unknown trig function");
                 }
 
+                if (correctAnswer > 1) {
+                    correctAnswer = "inf";
+                }
+
                 // we have the result of the trig function
                 if (correctAnswer != null) {
                     //console.log("result: " + correctAnswer);
@@ -176,7 +181,7 @@ function submit() {
         }
 
         // check if userAnswer matches correctAnswer
-        if (userAnswer == Number(correctAnswer)) {
+        if (userAnswer == Number(correctAnswer) || userAnswer == "inf" && correctAnswer == "inf") {
             console.log("correct: " + userAnswer + "=" + correctAnswer);
             numCorrect += 1;
         }
@@ -217,6 +222,10 @@ function parseFancyHTML(rawHTML) {
             result = Math.sqrt(sqrtNum);
         }
 
+        //console.log("before: " + result);
+        result = result.toFixed(1);
+        //console.log("after: " + result);
+
         if (rawHTML[0] == '-') {
             result *= -1;
         }
@@ -226,6 +235,9 @@ function parseFancyHTML(rawHTML) {
         let num1 = rawHTML.split("/")[0];
         let num2 = rawHTML.split("/")[1];
         result = num1 / num2;
+        //console.log("before: " + result);
+        result = result.toFixed(1);
+        //console.log("after: " + result);
     }
     return result;
 }
@@ -293,8 +305,8 @@ function getTableData(table) {
             // have two tds here
             let label = rows[i].children[j].children[0];
             let input = rows[i].children[j].children[1];
-            console.log(label);
-            console.log(input);
+            //console.log(label);
+            //console.log(input);
         }
     }
 }
@@ -328,7 +340,7 @@ function randomizeQuestions() {
         '<math><msqrt><mi>2</mi></msqrt></math>/2', '-<math><msqrt><mi>2</mi></msqrt></math>/2',
         '<math><msqrt><mi>2</mi></msqrt></math>', '-<math><msqrt><mi>2</mi></msqrt></math>',
         '<math><msqrt><mi>3</mi></msqrt></math>', '-<math><msqrt><mi>3</mi></msqrt></math>',
-        '-1/2'];
+        '-1/2', '-<math><msqrt><mi>3</mi></msqrt></math>/2'];
     let correctAnswer = null;
     let wrongAnswers = [];
     let mathProblem = null;
@@ -339,7 +351,15 @@ function randomizeQuestions() {
         //console.log(i);
         if (1 - Math.random() <= probabilityTrig) {
             let func = trigFuncs[Math.floor(Math.random() * trigFuncs.length)];
-            let degrees = Math.floor(Math.random() * 360 / 45) * 45;
+            let degrees = 0;
+            if (Math.random() >= 0.5) {
+                degrees = Math.floor(Math.random() * 360 / 45) * 45;
+            }
+            else {
+                degrees = Math.floor(Math.random() * 360 / 30) * 30;
+            }
+            
+            //degrees = 30;
             let arg = degrees * TO_RAD;
             arg = arg.toFixed(2);
             let result = null;
@@ -374,7 +394,8 @@ function randomizeQuestions() {
                 let compare = trigCommonValues[j];
                 if (clean != null) {
                     // if we got some result
-                    compare = clean.toFixed(1);
+                    //compare = clean.toFixed(1);
+                    compare = clean;
                 }
                 //console.log("result: " + result + " compare: " + compare);
                 if (Number(result) == Number(compare) || result == "inf" && compare == "inf") {
@@ -406,8 +427,8 @@ function randomizeQuestions() {
                     num2 = Math.round(Math.random() * 100);
                     correctAnswer = num1 + num2;
 
-                    wrongAnswers[0] = getRandomNumberNotInElements(wrongAnswers, arithWrongAnswerRandom, [num1, num2], "+");
-                    wrongAnswers[1] = getRandomNumberNotInElements(wrongAnswers, arithWrongAnswerRandom, [num1, num2], "+");
+                    wrongAnswers[0] = getRandomNumberNotInElements([wrongAnswers[0], wrongAnswers[1], correctAnswer], arithWrongAnswerRandom, [num1, num2], "+");
+                    wrongAnswers[1] = getRandomNumberNotInElements([wrongAnswers[0], wrongAnswers[1], correctAnswer], arithWrongAnswerRandom, [num1, num2], "+");
 
                     
                     break;
@@ -416,8 +437,8 @@ function randomizeQuestions() {
                     num2 = Math.round(Math.random() * 100);
 
                     correctAnswer = num1 - num2;
-                    wrongAnswers[0] = getRandomNumberNotInElements(wrongAnswers, arithWrongAnswerRandom, [num1, num2], "-");
-                    wrongAnswers[1] = getRandomNumberNotInElements(wrongAnswers, arithWrongAnswerRandom, [num1, num2], "-");
+                    wrongAnswers[0] = getRandomNumberNotInElements([wrongAnswers[0], wrongAnswers[1], correctAnswer], arithWrongAnswerRandom, [num1, num2], "-");
+                    wrongAnswers[1] = getRandomNumberNotInElements([wrongAnswers[0], wrongAnswers[1], correctAnswer], arithWrongAnswerRandom, [num1, num2], "-");
 
                     
                     break;
@@ -540,8 +561,9 @@ function randomizeQuestions() {
                         ptr += 1;
                     }
                 }
-                else if (labelsAndInputs[idx][1].tagName == "INPUT") {
+                if (labelsAndInputs[idx][1].tagName == "INPUT") {
                     // reset inputs
+                    //console.log("found input");
                     labelsAndInputs[idx][1].checked = false;
                 }
                 //labelsAndInputs[j + (questionPtr * 3)]
