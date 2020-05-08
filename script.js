@@ -281,22 +281,6 @@ function getRandomNumberNotInElements(elements, range, supplement, operator=null
     return n;
 }
 
-function getTableData(table) {
-    // get the data from the table
-    let rows = table.children[0].children;
-    //console.log(rows);
-    for (let i = 0; i < rows.length; i++) {
-        //console.log(rows[i].children);
-        for (let j = 0; j < rows[i].children.length; j++) {
-            // have two tds here
-            let label = rows[i].children[j].children[0];
-            let input = rows[i].children[j].children[1];
-            //console.log(label);
-            //console.log(input);
-        }
-    }
-}
-
 function getLabelsAndInputs() {
     let labelsAndInputs = [];
     let tableData = document.getElementsByTagName("td");
