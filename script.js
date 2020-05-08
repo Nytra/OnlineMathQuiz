@@ -32,6 +32,8 @@ function submit() {
 
         let userAnswer = null;
 
+        //console.log(children);
+
         for (let j = 0; j < children.length; j++) {
             
             // check for h2 tag, only if we have not already obtained the math problem
@@ -64,18 +66,30 @@ function submit() {
 
             }
 
-            // if we have not yet obtained the user selected answer
-            else if (children[j].tagName == "INPUT" && children[j].checked && userAnswer == null) {
-                selectedId = children[j].id;
-
-                // find the label with 'for' attribute as '#id'
-                for (let k = 0; k < children.length; k++) {
-                    if (children[k].tagName == "LABEL" && children[k].getAttribute("for") == '#' + selectedId) {
-                        // we have the user answer
-                        userAnswer = children[k].innerHTML; 
+            let labelsAndInputs = getLabelsAndInputs();
+            for (let k = 0; k <= 2; k++) {
+                let idx = k + (i * 3);
+                let inputElement = labelsAndInputs[idx][1];
+                if (inputElement.tagName == "INPUT" && inputElement.checked && userAnswer == null) {
+                    selectedId = inputElement.id;
+                    if (labelsAndInputs[idx][0].tagName == "LABEL" && labelsAndInputs[idx][0].getAttribute("for") == "#" + selectedId) {
+                        userAnswer = labelsAndInputs[idx][0].innerHTML;
                     }
                 }
             }
+
+            // if we have not yet obtained the user selected answer
+            // else if (children[j].tagName == "INPUT" && children[j].checked && userAnswer == null) {
+            //     selectedId = children[j].id;
+
+            //     // find the label with 'for' attribute as '#id'
+            //     for (let k = 0; k < children.length; k++) {
+            //         if (children[k].tagName == "LABEL" && children[k].getAttribute("for") == '#' + selectedId) {
+            //             // we have the user answer
+            //             userAnswer = children[k].innerHTML; 
+            //         }
+            //     }
+            // }
             
         }
 
@@ -285,6 +299,19 @@ function getTableData(table) {
     }
 }
 
+function getLabelsAndInputs() {
+    let labelsAndInputs = [];
+    let tableData = document.getElementsByTagName("td");
+    
+    let ptr = 0;
+    for (let k = 0; k < tableData.length - 1; k+=2) {
+        labelsAndInputs[ptr] = [tableData[k].children[0], tableData[k+1].children[0]];
+        ptr += 1;
+    }
+    //console.log(labelsAndInputs);
+    return labelsAndInputs;
+}
+
 function randomizeQuestions() {
     // this function will generate new questions on page load
     // first get all question divs
@@ -462,29 +489,29 @@ function randomizeQuestions() {
         let children = questions[i].children;
         //console.log(children);
 
-        let labelsAndInputs = [];
-        for (let j = 0; j < children.length; j++) {
-            if (children[j].tagName == "TABLE") {
-                //let tableData = getTableData(children[j]);
-                // 012,345,678
-                // if i == 0, 2, 
-                let tableData = document.getElementsByTagName("td");
-                //console.log("tds: " + tableData);
-                let ptr = 0;
-                //let tds = [];
-                for (let k = 0; k < tableData.length - 1; k+=2) {
-                    //console.log(tableData[k]);
-                    labelsAndInputs[ptr] = [tableData[k].children[0], tableData[k+1].children[0]];
-                    //labelsAndInputs[ptr] = tableData[k];
-                    ptr += 1;
-                }
+        let labelsAndInputs = getLabelsAndInputs();
+        // for (let j = 0; j < children.length; j++) {
+        //     if (children[j].tagName == "TABLE") {
+        //         //let tableData = getTableData(children[j]);
+        //         // 012,345,678
+        //         // if i == 0, 2, 
+        //         let tableData = document.getElementsByTagName("td");
+        //         //console.log("tds: " + tableData);
+        //         let ptr = 0;
+        //         //let tds = [];
+        //         for (let k = 0; k < tableData.length - 1; k+=2) {
+        //             //console.log(tableData[k]);
+        //             labelsAndInputs[ptr] = [tableData[k].children[0], tableData[k+1].children[0]];
+        //             //labelsAndInputs[ptr] = tableData[k];
+        //             ptr += 1;
+        //         }
                 
-                //console.log(tableData);
-            }
-        }
+        //         //console.log(tableData);
+        //     }
+        // }
         if (labelsAndInputs.length > 0) {
-            console.log("labelsandinputs:");
-            console.log(labelsAndInputs);
+            //console.log("labelsandinputs:");
+            //console.log(labelsAndInputs);
         }
         
         let correctAnswerInserted = false;
@@ -500,8 +527,8 @@ function randomizeQuestions() {
         if (labelsAndInputs.length > 0) {
             for (let j = 0; j <= 2; j++) {
                 let idx = j + (i * 3);
-                idx = j;
-                console.log("idx: " + idx);
+                //idx = j;
+                //console.log("idx: " + idx);
                 if (labelsAndInputs[idx][0].tagName == "LABEL") {
                     //console.log("found label");
                     if (correctAnswerInserted == false && Math.random() > 0.8 || ptr == 2) {
