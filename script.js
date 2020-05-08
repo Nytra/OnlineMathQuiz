@@ -32,8 +32,6 @@ function submit() {
 
         let userAnswer = null;
 
-        //console.log(children);
-
         for (let j = 0; j < children.length; j++) {
             
             // check for h2 tag, only if we have not already obtained the math problem
@@ -66,6 +64,7 @@ function submit() {
 
             }
 
+            // get userAnswer 
             let labelsAndInputs = getLabelsAndInputs();
             for (let k = 0; k <= 2; k++) {
                 let idx = k + (i * 3);
@@ -78,19 +77,6 @@ function submit() {
                     }
                 }
             }
-
-            // if we have not yet obtained the user selected answer
-            // else if (children[j].tagName == "INPUT" && children[j].checked && userAnswer == null) {
-            //     selectedId = children[j].id;
-
-            //     // find the label with 'for' attribute as '#id'
-            //     for (let k = 0; k < children.length; k++) {
-            //         if (children[k].tagName == "LABEL" && children[k].getAttribute("for") == '#' + selectedId) {
-            //             // we have the user answer
-            //             userAnswer = children[k].innerHTML; 
-            //         }
-            //     }
-            // }
             
         }
 
@@ -348,7 +334,7 @@ function randomizeQuestions() {
     console.log("length: " + questions.length);
 
     for (let i = 0; i < questions.length; i++) {
-        //console.log(i);
+
         if (1 - Math.random() <= probabilityTrig) {
             let func = trigFuncs[Math.floor(Math.random() * trigFuncs.length)];
             let degrees = 0;
@@ -358,16 +344,14 @@ function randomizeQuestions() {
             else {
                 degrees = Math.floor(Math.random() * 360 / 30) * 30;
             }
-            
-            //degrees = 30;
+
             let arg = degrees * TO_RAD;
             arg = arg.toFixed(2);
             let result = null;
             //console.log("func: " + func);
             //console.log("arg: " + arg);
             //console.log(func + "(" + degrees + ")");
-            //arg = 90 * TO_RAD;
-            //func = 'tan';
+
             switch(func) {
                 case 'sin':
                     result = Math.sin(arg).toFixed(1);
@@ -385,19 +369,14 @@ function randomizeQuestions() {
             if (result > 1) {
                 result = "inf";
             }
-            else {
-                // not inf
-            }
 
             for (let j = 0; j < trigCommonValues.length; j++) {
                 let clean = parseFancyHTML(trigCommonValues[j]);
                 let compare = trigCommonValues[j];
                 if (clean != null) {
-                    // if we got some result
-                    //compare = clean.toFixed(1);
                     compare = clean;
                 }
-                //console.log("result: " + result + " compare: " + compare);
+
                 if (Number(result) == Number(compare) || result == "inf" && compare == "inf") {
                     correctAnswer = trigCommonValues[j];
                     let wrong1 = getRandomElementIndex(trigCommonValues, [j,])
@@ -420,13 +399,14 @@ function randomizeQuestions() {
             let num1 = null;
             let num2 = null;
             let arithWrongAnswerRandom = 5;
-            //console.log(num1 + " " + operator + " " + num2);
+
             switch(operator) {
                 case '+':
                     num1 = Math.round(Math.random() * 100);
                     num2 = Math.round(Math.random() * 100);
                     correctAnswer = num1 + num2;
 
+                    // function ensures random value is unique ie not already in wrongAnswers or same as correctAnswer
                     wrongAnswers[0] = getRandomNumberNotInElements([wrongAnswers[0], wrongAnswers[1], correctAnswer], arithWrongAnswerRandom, [num1, num2], "+");
                     wrongAnswers[1] = getRandomNumberNotInElements([wrongAnswers[0], wrongAnswers[1], correctAnswer], arithWrongAnswerRandom, [num1, num2], "+");
 
@@ -447,8 +427,7 @@ function randomizeQuestions() {
                     num2 = Math.round(Math.random() * 20);
                     correctAnswer = num1 * num2;
 
-                    //wrongAnswers[0] = getRandomNumberNotInElements(wrongAnswers, arithWrongAnswerRandom - 2, [num1, num2], "x");
-                    //wrongAnswers[1] = getRandomNumberNotInElements(wrongAnswers, arithWrongAnswerRandom - 2, [num1, num2], "x");
+                    // keep looping this until all possible answers are unique
                     do {
                         if (Math.random() >= 0.5) {
                             wrongAnswers[0] = num1 * (num2 + Math.round(Math.random() * arithWrongAnswerRandom - 2))
@@ -474,6 +453,7 @@ function randomizeQuestions() {
                     correctAnswer = num1 / num2;
 
                     let newNum2 = null;
+                    // keep looping this until all possible answers are unique
                     do {
                         if (Math.random() >= 0.5) {
                             newNum2 = num2 + Math.round(Math.random() * 3);
@@ -495,63 +475,28 @@ function randomizeQuestions() {
                 default:
                     console.log("error: unknown operator");
             }
+            // optionally display the answer at the end of the problem, for debugging
             //mathProblem = num1 + " " + operator + " " + num2 + " = " + correctAnswer;
             mathProblem = num1 + " " + operator + " " + num2;
         }
-
-        
-        //console.log(num1 + " " + operator + " " + num2 + " = " + correctAnswer);
-        //console.log("wrong: " + wrongAnswers);
 
         // now update h2, labels and clear inputs
         // just set innerHTML of labels
         // get children
         // assuming they are in order of HTML
         let children = questions[i].children;
-        //console.log(children);
 
         let labelsAndInputs = getLabelsAndInputs();
-        // for (let j = 0; j < children.length; j++) {
-        //     if (children[j].tagName == "TABLE") {
-        //         //let tableData = getTableData(children[j]);
-        //         // 012,345,678
-        //         // if i == 0, 2, 
-        //         let tableData = document.getElementsByTagName("td");
-        //         //console.log("tds: " + tableData);
-        //         let ptr = 0;
-        //         //let tds = [];
-        //         for (let k = 0; k < tableData.length - 1; k+=2) {
-        //             //console.log(tableData[k]);
-        //             labelsAndInputs[ptr] = [tableData[k].children[0], tableData[k+1].children[0]];
-        //             //labelsAndInputs[ptr] = tableData[k];
-        //             ptr += 1;
-        //         }
-                
-        //         //console.log(tableData);
-        //     }
-        // }
-        if (labelsAndInputs.length > 0) {
-            //console.log("labelsandinputs:");
-            //console.log(labelsAndInputs);
-        }
         
         let correctAnswerInserted = false;
         let ptr = 0;
 
-        // change the label and input processing
+        // change the labels and reset the inputs
 
-        //let questionPtr = 0;
-        // questionPtr just i ???
-        // 012 345 678 9,10,11 12,13,14 15,16,17
-        //console.log("i: " + i);
-        //console.log("max lai idx: " + labelsAndInputs.length -1);
         if (labelsAndInputs.length > 0) {
             for (let j = 0; j <= 2; j++) {
                 let idx = j + (i * 3);
-                //idx = j;
-                //console.log("idx: " + idx);
                 if (labelsAndInputs[idx][0].tagName == "LABEL") {
-                    //console.log("found label");
                     if (correctAnswerInserted == false && Math.random() > 0.8 || ptr == 2) {
                         labelsAndInputs[idx][0].innerHTML = correctAnswer;
                         correctAnswerInserted = true;
@@ -563,38 +508,16 @@ function randomizeQuestions() {
                 }
                 if (labelsAndInputs[idx][1].tagName == "INPUT") {
                     // reset inputs
-                    //console.log("found input");
                     labelsAndInputs[idx][1].checked = false;
                 }
-                //labelsAndInputs[j + (questionPtr * 3)]
             }
-            //questionPtr += 1;
         }
-
         
-        
+        // set the h2 to display the new math problem
         for (let j = 0; j < children.length; j++) {
             if (children[j].tagName == "H2") {
                 children[j].innerHTML = mathProblem;
             }
-            //else if (children[j].tagName == "LABEL") {
-                // we have three labels per question. 
-                // we have three possible texts per label
-                // the correct text, and two incorrect texts
-                // we will assign these texts at random, being careful not to assign the same one multiple times
-                //if (correctAnswerInserted == false && Math.random() > 0.8 || ptr == 2) {
-                    //children[j].innerHTML = correctAnswer;
-                    //correctAnswerInserted = true;
-                //}
-                //else { 
-                    //children[j].innerHTML = wrongAnswers[ptr];
-                    //ptr += 1;
-                //}
-            //}
-            //else if (children[j].tagName == "INPUT") {
-                // reset inputs
-                //children[j].checked = false;
-            //}
         }
     }
     // reset result label
